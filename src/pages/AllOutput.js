@@ -1,46 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
 
-function AllOutput() {
-  const [allData, setAllData] = useState([]);
+export const AllOutput = () => {
+  const [scans, setScans] = useState([]);
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await axios.get('http://localhost:3002/api/allData');
-        setAllData(response.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    }
-
-    fetchData();
+    fetch('http://localhost:3001/api/scans')
+      .then(response => response.json())
+      .then(data => setScans(data))
+      .catch(err => console.error('Error fetching scans:', err));
   }, []);
-
-  const renderData = (data) => {
-    return (
-      <ul>
-        {data.map((item, index) => (
-          <li key={index}>
-            <strong>{item.name}</strong>
-            {item.type === 'file' && item.content && <pre>{item.content}</pre>}
-            {item.type === 'directory' && renderData(item.contents)}
-          </li>
-        ))}
-      </ul>
-    );
-  };
 
   return (
     <div className="allOutput">
-      <h1 style={{ margin: 0, padding: '10px', backgroundColor: 'rgb(56, 176, 0)', color: 'white' }}>All Output Tool</h1>
-      <section className="outputSection" style={{ flex: 1, margin: '20px', padding: '20px', backgroundColor: '#fefae0', border: '2px solid #ccc', borderRadius: '5px', overflow: 'auto' }}>
+      <h1 style={{ margin: 0, padding: '20px', backgroundColor: 'rgb(56, 176, 0) ', color: 'white' }}>All Output Tool</h1>
+      <section className="outputSection" style={{ flex: 1, margin: '20px', padding: '20px', backgroundColor: '#f0f0f0', border: '2px solid #ccc', borderRadius: '5px', overflow: 'auto' }}>
         <div>
-          {renderData(allData)}
+          {scans.map((scan, index) => (
+            <div key={index}>
+              <h3 style={{ margin: '10px 0' }}>{scan.ip} - {scan.fileName}</h3>
+              <pre style={{ whiteSpace: 'pre-wrap' }}>{scan.content}</pre>
+            </div>
+          ))}
         </div>
       </section>
     </div>
   );
-}
+};
 
 export default AllOutput;
